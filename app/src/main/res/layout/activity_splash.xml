@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray"
+    >
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@null"
+        android:src="@mipmap/splash_pic"
+        android:id="@+id/iv_splash_pic"
+        android:scaleType="fitXY"
+        />
+    <TextView
+        style="@style/common_tv_style"
+        android:text="跳过"
+        android:layout_gravity="top|end"
+        android:padding="5dp"
+        android:id="@+id/tv_jump_over_splash"
+        android:textColor="@color/black"
+        />
+</FrameLayout>
