@@ -1,5 +1,6 @@
 package com.soft.baseproject.demo.ui;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -10,6 +11,9 @@ import com.soft.baseproject.demo.net.GitHubApi;
 import java.util.List;
 
 import common.base.activitys.BaseNetCallActivity;
+import common.base.netAbout.BaseServerResult;
+import common.base.netAbout.NetDataAndErrorListener;
+import common.base.utils.CommonLog;
 
 /**
  * User: fee(1176610771@qq.com)
@@ -17,7 +21,7 @@ import common.base.activitys.BaseNetCallActivity;
  * Time: 18:47
  * DESC:
  */
-public class ResposOfUserActivity extends BaseNetCallActivity<List<Respo>>{
+public class ResposOfUserActivity extends BaseNetCallActivity<BaseServerResult>{
     TextView tvRespResult;
 
     /**
@@ -42,6 +46,9 @@ public class ResposOfUserActivity extends BaseNetCallActivity<List<Respo>>{
 
     @Override
     protected void initData() {
+        Log.e("info", TAG + "--> initData() CommonLog.ISDEBUG == " + CommonLog.ISDEBUG);
+        //开启这个可以查看网络请求返回时的Log信息，以及生命周期的信息
+        LIFE_CIRCLE_DEBUG = true;
         super.initData();
         //这一步需要调用,表明本界面会有网络请求并且需要监听网络响应
         initNetDataListener();
@@ -54,15 +61,8 @@ public class ResposOfUserActivity extends BaseNetCallActivity<List<Respo>>{
      * @param result
      */
     @Override
-    protected void dealWithResponse(int requestDataType, List<Respo> result) {
-        switch (requestDataType) {//这样来区分当前响应的是哪个网络请求
-            case GitHubApi.TYPE_GET_RESPO_OF_USER:
-                //之前有Loading对象框，网络请求完成后，得取消loading...
-                //uihintAgent见基类BaseActivity
-                uiHintAgent.loadDialogDismiss();
-                tvRespResult.setText(result == null ? "没有响应数据" : result.toString());
-                break;
-        }
+    protected void dealWithResponse(int requestDataType, BaseServerResult result) {
+
         super.dealWithResponse(requestDataType, result);
     }
 
@@ -83,6 +83,11 @@ public class ResposOfUserActivity extends BaseNetCallActivity<List<Respo>>{
     }
 
     /**
+     * 此处来介绍如果本界面所要求的网络请求响应类型T被指定了BaseServerResult
+     * 后，如果有其他的网络请求接口响应时并不能序列化成BaseServerResult时，则使用指定的响应类型的监听者
+     */
+    NetDataAndErrorListener<List<Respo>> listener4DiffTypeResponse;
+    /**
      * 点击事件重写基类的onClick()方法就行了
      * @param v The view that was clicked.
      */
@@ -97,7 +102,28 @@ public class ResposOfUserActivity extends BaseNetCallActivity<List<Respo>>{
                 showCommonLoading("正在请求,请稍候.....");
                 //这里就是网络请求了 其中的参数netDataAndErrorListener是BaseNetCallActivity里面的，为什么说本框架能让开发
                 //变简单点，就是各基类基本上考虑了APP的各种通用逻辑
-                GitHubApi.getAllRespoOfUser("feer921", netDataAndErrorListener);
+                if (listener4DiffTypeResponse == null) {
+                    listener4DiffTypeResponse = createETypeListener();
+                }
+                GitHubApi.getAllRespoOfUser("feer921", listener4DiffTypeResponse);
+                break;
+        }
+    }
+
+    /**
+     * 非本类T的网络响应类型在此处理
+     * @param requestDataType 当前网络请求类型
+     * @param responseResut 网络请求响应结果 这里为Object对象类型来通用，子类如果处理此回调时，自己强转成预期对象类型
+     */
+    @Override
+    protected void dealWithETypeResponse(int requestDataType, Object responseResut) {
+        switch (requestDataType) {//这样来区分当前响应的是哪个网络请求
+            case GitHubApi.TYPE_GET_RESPO_OF_USER:
+                //之前有Loading对话框，网络请求完成后，得取消loading...
+                //uihintAgent见基类BaseActivity
+                List<Respo> respos = (List<Respo>) responseResut;
+                uiHintAgent.loadDialogDismiss();
+                tvRespResult.setText(responseResut == null ? "没有响应数据" : responseResut.toString());
                 break;
         }
     }

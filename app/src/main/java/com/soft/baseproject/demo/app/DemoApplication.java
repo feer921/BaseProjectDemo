@@ -2,6 +2,7 @@ package com.soft.baseproject.demo.app;
 
 import common.base.BaseApplication;
 import common.base.netclients.RetrofitClient;
+import common.base.utils.CommonLog;
 
 /**
  * User: fee(1176610771@qq.com)
@@ -15,7 +16,7 @@ public class DemoApplication extends BaseApplication{
     public void onCreate() {
         //如果要使用BaseProject的网络请求，则先把服务端的网络地址host配置一下
         RetrofitClient.HOST_BASE_URL = "https://api.github.com/";
-
+        CommonLog.logEnable(true);
         super.onCreate();
     }
 }
