@@ -18,7 +18,7 @@ public class SplashActivity extends BaseSplashActiviity{
     protected void jumpToTargetActivity() {
         //跳转Activity的方法，基类中有
         jumpToActivity(MainActivity.class);
-        //闪屏页过滤完了，结束自己
+        //闪屏页过渡完了，结束自己
         finishSelf(true);
     }
 
